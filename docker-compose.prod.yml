@@ -1,0 +1,35 @@
+version: '3.4'
+
+services:
+    postgres:
+        build:
+            context: .
+            target: postgres
+        ports:
+            - "5432:5432"
+        environment:
+            - POSTGRES_DB=workspace
+            - POSTGRES_USER=postgres
+            - PGUSER=postgres
+            - POSTGRES_PASSWORD=password
+            - POSTGRES_HOST_AUTH_METHOD=trust
+            - PGGSSENCMODE=disable
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U postgres"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+        volumes:
+            - "./dbdata:/var/lib/postgresql/data"
+    server:
+        build:
+            context: .
+            target: nestjs-prod
+        ports:
+            - "8080:3000"
+        environment:
+            - ENV=production
+        command: "yarn run start:prod"
+        depends_on:
+            postgres:
+                condition: service_healthy
