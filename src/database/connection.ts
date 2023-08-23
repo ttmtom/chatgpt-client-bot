@@ -1,1 +1,1 @@
-export const connectionName = 'postgresConnection';
+export const connectionName = 'mongodbConnection';
