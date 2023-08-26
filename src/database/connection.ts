@@ -1,1 +1,1 @@
-export const connectionName = 'mongodbConnection';
+export const connectionName = 'nestTgGpt';

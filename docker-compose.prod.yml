@@ -7,7 +7,11 @@ services:
         environment:
             MONGO_INITDB_ROOT_USERNAME: root
             MONGO_INITDB_ROOT_PASSWORD: example
+            MONGO_INITDB_DATABASE: nestTgGpt
+        ports:
+            - "27017:27017"
         volumes:
+            - ./docker-entrypoint-initdb.d/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
             - "./dbdata:/data/db"
         healthcheck:
             test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
