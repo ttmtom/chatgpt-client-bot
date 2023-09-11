@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { MongoRepository } from 'typeorm';
 import { History } from '../../database/entities';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ChatGptChatResponse, ChatGptMessage } from '../chatGpt/chatGpt.type';
+import { ChatGptMessage } from '../chatGpt/chatGpt.type';
 
 @Injectable()
 export class HistoryService {
@@ -12,32 +12,22 @@ export class HistoryService {
   ) {}
 
   async getHistory(userId: string, session: string) {
-    const history = await this.historyRepository.findOne({
+    return await this.historyRepository.findOne({
       where: {
         userId,
         session,
       },
     });
-    return history;
   }
 
-  async updateHistoryResponse(
-    history: History,
-    userMsg: ChatGptMessage,
-    res: ChatGptChatResponse,
-  ) {
+  async updateHistoryResponse(history: History, userMsgs: ChatGptMessage[]) {
     const now = new Date();
-    history.histories.push({
-      ...userMsg,
-      timestamp: now,
-    });
-    res.forEach((message) => {
-      history.histories.push({
-        role: message.message.role,
-        content: message.message.content,
+    history.histories.push(
+      ...userMsgs.map((msg) => ({
+        ...msg,
         timestamp: now,
-      });
-    });
+      })),
+    );
     await this.historyRepository.save(history);
   }
 
@@ -47,8 +37,7 @@ export class HistoryService {
 
     const newHistory = new History(userId, sessionName);
 
-    const res = await this.historyRepository.save(newHistory);
-    return res;
+    return await this.historyRepository.save(newHistory);
   }
 
   async clearHistories(userId: string, sessionName: string) {

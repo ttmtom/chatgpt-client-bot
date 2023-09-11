@@ -10,3 +10,7 @@ export type ChatGptChatResponse = {
   message: ChatGptMessage;
   finish_reason: string;
 }[];
+
+export type TChatGptChatSuccessResponse = {
+  msgId: string;
+};

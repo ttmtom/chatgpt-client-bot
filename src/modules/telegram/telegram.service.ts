@@ -5,6 +5,7 @@ import { ChatGptService } from '../chatGpt/chatGpt.service';
 import { Message as TGMessage } from 'telegraf/typings/core/types/typegram';
 import { UserService } from '../user/user.service';
 import { HistoryService } from '../history/history.service';
+import { ChatGptChatResponse } from '../chatGpt/chatGpt.type';
 
 @Update()
 @Injectable()
@@ -137,16 +138,40 @@ export class TelegramService {
     };
 
     histories.push(usrMsg);
-    const res = await this.chatGptService.chat(user.model, histories);
-    console.log(res);
-    res.forEach((message) => {
-      ctx.reply(message.message.content);
-    });
-
-    await this.historyService.updateHistoryResponse(history, usrMsg, res);
+    const res = await this.chatGptService.chat(
+      user.userId,
+      user.session,
+      ctx.chat.id,
+      user.model,
+      histories,
+    );
+    await this.historyService.updateHistoryResponse(history, [usrMsg]);
+    console.log(JSON.stringify(res));
+    // res.forEach((message) => {
+    //   ctx.reply(message.message.content);
+    // });
+    //
   }
 
-  async sendMsg() {
-    // this.bot.sendMessage(MyUserId, message);
+  async sendMsg(
+    userId: string,
+    session: string,
+    chatId: number,
+    messages: ChatGptChatResponse,
+  ) {
+    const history = await this.historyService.getHistory(userId, session);
+    const userMsgs = [];
+
+    for (const msg of messages) {
+      console.log('--- msg', JSON.stringify(msg));
+      const { role, content } = msg.message;
+      userMsgs.push({
+        role,
+        content,
+      });
+      await this.bot.sendMessage(chatId, content);
+    }
+
+    await this.historyService.updateHistoryResponse(history, userMsgs);
   }
 }

@@ -5,6 +5,7 @@ import { TelegramService } from './telegram.service';
 import { ChatGptModule } from '../chatGpt/chatGpt.module';
 import { UserModule } from '../user/user.module';
 import { HistoryModule } from '../history/history.module';
+import { TelegramController } from './telegram.controller';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { HistoryModule } from '../history/history.module';
     UserModule,
     HistoryModule,
   ],
+  controllers: [TelegramController],
   providers: [TelegramService],
 })
 export class TelegramModule {}

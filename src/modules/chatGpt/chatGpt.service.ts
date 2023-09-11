@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import {
   ChatGptChatArgs,
-  ChatGptChatResponse,
   ChatGptMessage,
+  TChatGptChatSuccessResponse,
 } from './chatGpt.type';
 
 @Injectable()
@@ -22,11 +22,18 @@ export class ChatGptService {
     return res.data;
   }
 
-  async chat(model: string, messages: ChatGptMessage[]) {
+  async chat(
+    userId: string,
+    session: string,
+    chatId: number,
+    model: string,
+    messages: ChatGptMessage[],
+  ) {
+    console.log('---- chat');
     const res = await this.axiosInstance.post<
       ChatGptChatArgs,
-      AxiosResponse<ChatGptChatResponse>
-    >('/chat', JSON.stringify({ model, messages }), {
+      AxiosResponse<TChatGptChatSuccessResponse>
+    >('/chat', JSON.stringify({ userId, session, chatId, model, messages }), {
       headers: {
         'Content-Type': 'application/json',
       },
