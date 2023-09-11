@@ -1,29 +1,15 @@
 version: '3.4'
 
 services:
-    mongo:
-        image: mongo
-        restart: always
-        environment:
-            MONGO_INITDB_ROOT_USERNAME: root
-            MONGO_INITDB_ROOT_PASSWORD: example
-            MONGO_INITDB_DATABASE: nestTgGpt
-        ports:
-            - "27017:27017"
-        volumes:
-            - ./docker-entrypoint-initdb.d/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
-            - "./dbdata:/data/db"
-        healthcheck:
-            test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
     server:
         build:
             context: .
             target: nestjs-prod
-        ports:
-            - "8080:3000"
         environment:
             - ENV=production
         command: "yarn run start:prod"
-        depends_on:
-            mongo:
-                condition: service_healthy
+        extra_hosts:
+            - 'mongo:192.168.1.199'
+        volumes:
+            - ./logs:/home/logs
+

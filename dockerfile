@@ -1,9 +1,9 @@
-FROM node:18.17.1-alpine3.18 AS builder
+FROM arm64v8/node:16.20 AS builder
 
 FROM builder AS nestjs-dev
 WORKDIR /usr/src/app/
 COPY ./ /usr/src/app/
-RUN ["yarn", "install"]
+RUN ["yarn", "install", "--network-timeout", "600000"]
 
 FROM nestjs-dev AS nestjs-prod
 RUN ["yarn", "run", "build"]
